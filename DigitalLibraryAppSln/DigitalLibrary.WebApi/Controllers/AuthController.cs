@@ -1,5 +1,6 @@
 ﻿using DigitalLibrary.WebApi.Dtos;
 using DigitalLibrary.WebApi.Literals;
+using DigitalLibrary.WebApi.Repositories.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,24 +16,20 @@ namespace DigitalLibrary.WebApi.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IUserRepository _userRepository;
 
-        public AuthController(UserManager<IdentityUser> userManager)
+        public AuthController(UserManager<IdentityUser> userManager, IUserRepository userRepository)
         {
             _userManager = userManager;
+            _userRepository = userRepository;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto model)
         {
-            var user = new IdentityUser 
-            { 
-                UserName = model.UserName,
-                Email = model.Email,
-            };
 
-            var result = await _userManager.CreateAsync(user, model.Password);
-
-            if(!result.Succeeded) 
+            var result = await _userRepository.AddUser(model);
+            if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
             }

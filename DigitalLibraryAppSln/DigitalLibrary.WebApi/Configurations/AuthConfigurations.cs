@@ -15,6 +15,8 @@ public static class AuthConfigurations
             options.Password.RequireLowercase = true;
             options.Password.RequireUppercase = true;
             options.Password.RequiredLength = 8;
+            //options.User.RequireUniqueEmail = false;
+            //options.User.AllowedUserNameCharacters = "abcdefghijk"
 
             //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
             //options.Lockout.MaxFailedAccessAttempts = 5;

@@ -1,7 +1,10 @@
-﻿using DigitalLibrary.WebApi.Models;
+﻿using DigitalLibrary.WebApi.Literals;
+using DigitalLibrary.WebApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 
 namespace DigitalLibrary.WebApi.Configurations;
 
@@ -15,8 +18,7 @@ public static class AuthConfigurations
             options.Password.RequireLowercase = true;
             options.Password.RequireUppercase = true;
             options.Password.RequiredLength = 8;
-            //options.User.RequireUniqueEmail = false;
-            //options.User.AllowedUserNameCharacters = "abcdefghijk"
+           
 
             //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
             //options.Lockout.MaxFailedAccessAttempts = 5;
@@ -35,12 +37,11 @@ public static class AuthConfigurations
                 ValidateIssuer = false,
                 ValidateAudience = false,
                 ValidateLifetime = true,
-                ValidateIssuerSigningKey = false,
+                ValidateIssuerSigningKey = true,
                 //ValidIssuer = "issuer",
                 //ValidAudience = "audience",
-                //IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("clave_secreta")),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable(DigitalLibraryLiterals.JWT_KEY)))
                 //ClockSkew = TimeSpan.Zero
-
 
             };
         });

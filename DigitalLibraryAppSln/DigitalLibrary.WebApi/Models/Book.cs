@@ -1,10 +1,15 @@
-﻿namespace DigitalLibrary.WebApi.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace DigitalLibrary.WebApi.Models
 {
-    public class Book
+    public class Book : BaseTable
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public required string Title { get; set; }
-        public required string Author { get; set; }
+        public string Author { get; set; }
         public int PublicationYear { get; set; }
         public string CoverImageUrl { get; set; } // Optional
         public int Rating { get; set; } // Rating from 1 to 5

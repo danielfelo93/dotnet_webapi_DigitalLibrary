@@ -1,6 +1,8 @@
 ﻿using DigitalLibrary.WebApi.Dtos;
 using DigitalLibrary.WebApi.Literals;
 using DigitalLibrary.WebApi.Repositories.Contracts;
+using DigitalLibrary.WebApi.Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,55 +17,60 @@ namespace DigitalLibrary.WebApi.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
 
-        public AuthController(UserManager<IdentityUser> userManager, IUserRepository userRepository)
+        public AuthController(UserManager<IdentityUser> userManager, IUserService userService)
         {
-            _userManager = userManager;
-            _userRepository = userRepository;
+            _userService = userService;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto model)
         {
 
-            var result = await _userRepository.AddUser(model);
-            if (!result.Succeeded)
+            var response = await _userService.AddUserAsync(model);
+            if (response != null && response.IsSuccess)
             {
-                return BadRequest(result.Errors);
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(response);
             }
 
-            return Ok("User registered successfully");
         }
 
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto model)
         {
-            var user = await _userManager.FindByNameAsync(model.UserName);
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+            var response = await _userService.Login(model);
+            if (response != null && response.IsSuccess)
             {
-                var claims = new[]
-                {
-                    new Claim(ClaimTypes.Name, user.UserName)
-                };
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable(DigitalLibraryLiterals.JWT_KEY)));
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                return Ok(response);
+            }
+            else
+            {
+                return Unauthorized(response);
+            }
 
-                var token = new JwtSecurityToken(
-                    claims: claims,
-                    expires: DateTime.Now.AddMinutes(15),
-                    signingCredentials: creds
-                );
+        }
 
-                return Ok(new
-                { 
-                        token = new JwtSecurityTokenHandler().WriteToken(token),
-                        expiration = token.ValidTo
-                });
-            }    
-            return Unauthorized();
+        [Authorize]
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
+            var response = await _userService.RefreshToken(claimsIdentity.Name);
+            if (response != null && response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return Unauthorized(response);
+            }
+
         }
     }
 }

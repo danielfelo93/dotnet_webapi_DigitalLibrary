@@ -4,6 +4,7 @@ using DigitalLibrary.WebApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitalLibrary.WebApi.Migrations
 {
     [DbContext(typeof(DigitalLibraryAppDbContext))]
-    partial class DigitalLibraryAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241027222511_AddingAuditFields")]
+    partial class AddingAuditFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

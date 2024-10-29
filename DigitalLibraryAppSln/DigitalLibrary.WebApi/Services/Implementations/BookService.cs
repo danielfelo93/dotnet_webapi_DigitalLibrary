@@ -30,7 +30,7 @@ namespace DigitalLibrary.WebApi.Services.Implementations
             books.Review = request.Review;
             books.UserId = request.UserId;
 
-            await _bookRepository.Delete(books);
+            await _bookRepository.Add(books);
             var response = _mapper.Map<BookResponseDto>(books);
             return response;
         }
